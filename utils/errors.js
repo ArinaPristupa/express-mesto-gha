@@ -20,11 +20,11 @@ const error = (err, res) => {
     });
   }
   if (err instanceof mongoose.Error.DocumentNotFoundError) {
-    return res.status(ERROR_INTERNAL_SERVER).send({
+    return res.status(ERROR_INTERNAL_SERVER).orFail().send({
       message: 'Карточка или пользователь с указанным _id не найдена.',
     });
   }
-  return res.status(ERROR_INTERNAL_SERVER).send({
+  return res.status(ERROR_INTERNAL_SERVER).orFail().send({
     message: 'Ошибка по умолчанию',
   });
 };
