@@ -24,7 +24,10 @@ module.exports.createUser = (req, res) => {
 
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(req.user._id, {
+    name,
+    about,
+  }, { new: true, runValidators: true })
     .orFail()
     .then((user) => res.send({ data: user }))
     .catch((err) => error(err, res));
@@ -35,7 +38,9 @@ module.exports.updateAvatar = (req, res) => {
 
   User.findByIdAndUpdate(
     req.user._id,
-    { avatar },
+    {
+      avatar,
+    },
     {
       new: true, runValidators: true,
     },
