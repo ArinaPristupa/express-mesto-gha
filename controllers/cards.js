@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const { error } = require('../utils/errors');
+const { error, statusOk } = require('../utils/errors');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -19,12 +19,8 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => {
-      if (!card) {
-        return res.status(404).send({ message: 'Карточка или пользователь с указанным _id не найдена.' });
-      }
-      return res.status(200).send(card);
-    })
+    .orFail()
+    .then((card) => statusOk(card, res))
     .catch((err) => error(err, res));
 };
 
@@ -34,13 +30,8 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .then((card) => {
-      if (!card) {
-        return res.status(404).send({ message: 'Карточка или пользователь с указанным _id не найдена.' });
-      }
-
-      return res.status(200).send(card);
-    })
+    .orFail()
+    .then((card) => statusOk(card, res))
     .catch((err) => error(err, res));
 };
 
@@ -50,12 +41,7 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-    .then((card) => {
-      if (!card) {
-        return res.status(404).send({ message: 'карточка или пользователь с указанным _id не найдена.' });
-      }
-
-      return res.status(200).send(card);
-    })
+    .orFail()
+    .then((card) => statusOk(card, res))
     .catch((err) => error(err, res));
 };

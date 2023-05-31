@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const router = require('./routes/router');
+const router = require('express').Router();
 
 const app = express();
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
@@ -17,5 +17,15 @@ app.use((req, res, next) => {
 
   next();
 });
+
+const usersRouter = require('./routes/users');
+const cardsRouter = require('./routes/cards');
+
+app.use('/users', usersRouter);
+app.use('/cards', cardsRouter);
+
+app.use('/', router.all('*', (req, res) => res.status(404).send({
+  message: '404: Ошибка! Данные не найдены!',
+})));
 
 app.listen(3000);

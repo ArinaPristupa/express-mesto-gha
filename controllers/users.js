@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const { error } = require('../utils/errors');
+const { error, statusOk } = require('../utils/errors');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -10,13 +10,7 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserId = (req, res) => {
   User.findById(req.params.userId)
     .orFail()
-    .then((card) => {
-      if (!card) {
-        return res.status(404).send({ message: 'Карточка или пользователь с указанным _id не найдена.' });
-      }
-
-      return res.status(200).send(card);
-    })
+    .then((card) => statusOk(card, res))
     .catch((err) => error(err, res));
 };
 

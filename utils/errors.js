@@ -1,8 +1,18 @@
 const mongoose = require('mongoose');
 
+const OK = 200;
 const ERROR_BAD_REQUEST = 400;
 const ERROR_NOT_FOUND = 404;
 const ERROR_INTERNAL_SERVER = 500;
+
+const statusOk = (req, res) => {
+  if (!req) {
+    return res.status(ERROR_NOT_FOUND).send({
+      message: 'По указанному _id нет данных',
+    });
+  }
+  return res.status(OK).send(req);
+};
 
 const errorDate = (req, res) => res.status(ERROR_NOT_FOUND).send({
   message: 'Переданы некорректные данные при создании карточки',
@@ -32,4 +42,5 @@ const error = (err, res) => {
 module.exports = {
   error,
   errorDate,
+  statusOk,
 };
