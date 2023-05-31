@@ -9,6 +9,7 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserId = (req, res) => {
   User.findById(req.params.userId)
+    .orFail()
     .then((user) => res.send(user))
     .catch((err) => error(err, res));
 };
@@ -24,6 +25,7 @@ module.exports.createUser = (req, res) => {
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+    .orFail()
     .then((user) => res.status(200).send(user))
     .catch((err) => error(err, res));
 };
