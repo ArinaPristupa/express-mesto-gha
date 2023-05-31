@@ -8,12 +8,11 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.createCard = (req, res) => {
-  const { _id } = req.user;
-
   const { name, link } = req.body;
+  const owner = req.user._id;
+  Card.create({ name, link, owner })
 
-  Card.create({ name, link, owner: _id })
-    .then((card) => res.send(card))
+    .then((card) => res.status(201).send(card))
     .catch((err) => error(err, res));
 };
 
