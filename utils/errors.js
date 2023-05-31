@@ -39,8 +39,4 @@ const error = (err, res) => {
   });
 };
 
-module.exports = {
-  error,
-  errorDate,
-  statusOk,
-};
+module.exports = { error, errorDate, statusOk };
