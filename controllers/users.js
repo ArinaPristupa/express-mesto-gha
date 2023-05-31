@@ -10,7 +10,13 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserId = (req, res) => {
   User.findById(req.params.userId)
     .orFail()
-    .then((user) => res.send(user))
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send({ message: 'Карточка или пользователь с указанным _id не найдена.' });
+      }
+
+      return res.status(200).send(card);
+    })
     .catch((err) => error(err, res));
 };
 
@@ -26,7 +32,7 @@ module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .orFail()
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.send({ data: user }))
     .catch((err) => error(err, res));
 };
 
@@ -42,6 +48,6 @@ module.exports.updateAvatar = (req, res) => {
       new: true, runValidators: true,
     },
   )
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.send({ data: user }))
     .catch((err) => error(err, res));
 };
