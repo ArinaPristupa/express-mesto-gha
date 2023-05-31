@@ -5,8 +5,6 @@
   "main": "index.js",
   "dependencies": {
     "body-parser": "^1.20.2",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.27.5",
     "express": "^4.18.2",
     "mongoose": "^7.1.1"
   },
@@ -28,6 +26,8 @@
   "homepage": "https://github.com/ArinaPristupa/express-mesto-gha#readme",
   "devDependencies": {
     "eslint": "^8.40.0",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5"
   }
 }
