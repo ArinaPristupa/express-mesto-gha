@@ -1,15 +1,14 @@
+const isURL = require('validator/lib/isURL');
 const { celebrate, Joi } = require('celebrate');
 
-const { NotFoundError } = require('../utils/error/NotFoundError');
-
-const isURL = /^(https?:\/\/)(www\.)?(?!-)[-a-zA-Z0-9@:%._~#=]{1,249}(?<!-)\.[A-Za-z]{2,6}([-a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=]*)#?$/;
+const { BadRequestError } = require('../utils/error/BadRequestError');
 
 const validationUrl = (url) => {
   const validate = isURL(url);
   if (validate) {
     return url;
   }
-  throw new NotFoundError('Неправильный URL адрес');
+  throw new BadRequestError('Некорректный URL адрес');
 };
 
 const validationId = (schema = 'cardId') => celebrate({

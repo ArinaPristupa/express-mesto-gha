@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
 const { error, statusOk } = require('../utils/errors');
+const { BadRequestError } = require('../utils/error/BadRequestError');
+const { ConflictError } = require('../utils/error/ConflictError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -60,7 +62,15 @@ module.exports.createUser = (req, res, next) => {
               },
             },
           ))
-        .catch((err) => error(err, next));
+        .catch((err) => {
+          if (err.code === 11000) {
+            return next(new ConflictError('Пользователь с таким email уже существует'));
+          }
+          if (err.name === 'ValidationError') {
+            return next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
+          }
+          return next(err);
+        });
     })
     .catch(next);
 };
