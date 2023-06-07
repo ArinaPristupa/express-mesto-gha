@@ -15,7 +15,7 @@ module.exports.createCard = (req, res, next) => {
   Card.create({ name, link, owner })
 
     .then((card) => res.status(201).send(card))
-    .catch((err) => error(err, next));
+    .catch(next);
 };
 
 module.exports.deleteCard = (req, res, next) => {
@@ -30,7 +30,7 @@ module.exports.deleteCard = (req, res, next) => {
       return Card.deleteOne(card)
         .then(() => res.status(200).send({ message: 'Карточка успешно удаленна!' }));
     })
-    .catch((err) => error(err, next));
+    .catch(next);
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -41,7 +41,7 @@ module.exports.likeCard = (req, res, next) => {
   )
     .orFail()
     .then((card) => statusOk(card, res))
-    .catch((err) => error(err, next));
+    .catch(next);
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -52,5 +52,5 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .orFail()
     .then((card) => statusOk(card, res))
-    .catch((err) => error(err, next));
+    .catch(next);
 };

@@ -1,35 +1,27 @@
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
-const { error, statusOk } = require('../utils/errors');
-const { BadRequestError } = require('../utils/error/BadRequestError');
-const { ConflictError } = require('../utils/error/ConflictError');
+const { statusOk } = require('../utils/errors');
+// const { BadRequestError } = require('../utils/error/BadRequestError');
+// const { ConflictError } = require('../utils/error/ConflictError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((user) => res.send(user))
-    .catch((err) => error(err, next));
+    .catch(next);
 };
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => statusOk(user, res))
-    .catch((err) => error(err, next));
+    .catch(next);
 };
 
 module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail()
     .then((card) => statusOk(card, res))
-    .catch((err) => error(err, next));
-};
-
-module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
-
-  User.create({ name, about, avatar })
-    .then((user) => res.status(201).send(user))
-    .catch((err) => error(err, next));
+    .catch(next);
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -62,17 +54,8 @@ module.exports.createUser = (req, res, next) => {
               },
             },
           ))
-        .catch((err) => {
-          if (err.code === 11000) {
-            return next(new ConflictError('Пользователь с таким email уже существует'));
-          }
-          if (err.name === 'ValidationError') {
-            return next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
-          }
-          return next(err);
-        });
-    })
-    .catch(next);
+        .catch(next);
+    });
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -83,7 +66,7 @@ module.exports.updateUser = (req, res, next) => {
   }, { new: true, runValidators: true })
     .orFail()
     .then((user) => res.send({ data: user }))
-    .catch((err) => error(err, next));
+    .catch(next);
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -99,7 +82,7 @@ module.exports.updateAvatar = (req, res, next) => {
     },
   )
     .then((user) => res.send({ data: user }))
-    .catch((err) => error(err, next));
+    .catch(next);
 };
 
 module.exports.login = (req, res, next) => {
