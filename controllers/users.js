@@ -38,22 +38,31 @@ module.exports.createUser = (req, res, next) => {
     email,
     password,
   } = req.body;
-  return bcryptjs
-    .hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
-    .then((user) => res.status(201).send({
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-    }))
-    .catch((err) => error(err, next));
+
+  bcryptjs.hash(password, 10)
+    .then((hash) => {
+      User
+        .create({
+          name,
+          about,
+          avatar,
+          email,
+          password: hash,
+        })
+        .then(() => res.status(201)
+          .send(
+            {
+              data: {
+                name,
+                about,
+                avatar,
+                email,
+              },
+            },
+          ))
+        .catch((err) => error(err, next));
+    })
+    .catch(next);
 };
 
 module.exports.updateUser = (req, res, next) => {
