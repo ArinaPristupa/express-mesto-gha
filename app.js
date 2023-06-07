@@ -3,6 +3,12 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const router = require('express').Router();
+const { errors } = require('celebrate');
+
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const { validationCreateUser, validationLogin } = require('./middlewares/validation');
+const handleError = require('./utils/errors');
 
 const app = express();
 
@@ -14,14 +20,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(helmet());
+app.use(auth);
+app.use(errors());
+app.use(handleError);
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6474ce2a1f17a2f77882040e', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
+app.post('/signup', validationCreateUser, createUser);
+app.post('/signin', validationLogin, login);
 
-  next();
-});
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
