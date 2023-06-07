@@ -44,39 +44,8 @@ const error = (err, req, res, next) => {
   return next();
 };
 
-const handleError = (err, req, res, next) => {
-  const { statusCode = ERROR_INTERNAL_SERVER, message } = err;
-  res.status(statusCode)
-    .send({
-      message: statusCode === ERROR_INTERNAL_SERVER ? message : 'На сервере произошла ошибка',
-    });
-  next();
-};
-
 module.exports = {
   error,
   errorDate,
   statusOk,
-  handleError,
 };
-
-// const error = (err, res) => {
-//   if (err instanceof mongoose.Error.ValidationError) {
-//     return res.status(ERROR_BAD_REQUEST).send({
-//       message: 'Переданы неверные данные',
-//     });
-//   }
-//   if (err instanceof mongoose.Error.CastError) {
-//     return res.status(ERROR_BAD_REQUEST).send({
-//       message: 'Переданы неверные данные',
-//     });
-//   }
-//   if (err instanceof mongoose.Error.DocumentNotFoundError) {
-//     return res.status(ERROR_NOT_FOUND).send({
-//       message: 'Карточка или пользователь с указанным _id не найдена.',
-//     });
-//   }
-//   return res.status(ERROR_INTERNAL_SERVER).send({
-//     message: 'Ошибка по умолчанию',
-//   });
-// };
