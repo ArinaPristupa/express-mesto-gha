@@ -26,8 +26,8 @@ app.use('/', router.all('*', (req, res) => res.status(404).send({
   message: '404: Ошибка! Данные не найдены!',
 })));
 
-app.use(errors());
 app.use(helmet());
+app.use(errors());
 app.use(handleError);
 
 app.post('/signup', validationCreateUser, createUser);

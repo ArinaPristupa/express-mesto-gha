@@ -1,26 +1,28 @@
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
-const { statusOk } = require('../utils/errors');
-// const { BadRequestError } = require('../utils/error/BadRequestError');
-// const { ConflictError } = require('../utils/error/ConflictError');
+const { ConflictError } = require('../utils/error/ConflictError');
+const { NotFoundError } = require('../utils/error/NotFoundError');
 
 module.exports.getUsers = (req, res, next) => {
-  User.find({})
+  User.find()
     .then((user) => res.send(user))
     .catch(next);
 };
 
 module.exports.getUser = (req, res, next) => {
-  User.findById(req.user._id)
-    .then((user) => statusOk(user, res))
+  const { userId } = req.params;
+  User.findById(userId)
+    .orFail(new NotFoundError('Переданы неверные данные'))
+    .then((user) => res.send(user))
     .catch(next);
 };
 
 module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail()
-    .then((card) => statusOk(card, res))
+    .then((user) => {
+      res.send(user);
+    })
     .catch(next);
 };
 
@@ -34,27 +36,29 @@ module.exports.createUser = (req, res, next) => {
   } = req.body;
 
   bcryptjs.hash(password, 10)
-    .then((hash) => {
-      User
-        .create({
-          name,
-          about,
-          avatar,
-          email,
-          password: hash,
-        })
-        .then(() => res.status(201)
-          .send(
-            {
-              data: {
-                name,
-                about,
-                avatar,
-                email,
-              },
-            },
-          ))
-        .catch(next);
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then(() => res.status(201)
+      .send(
+        {
+          data: {
+            name,
+            about,
+            avatar,
+            email,
+          },
+        },
+      ))
+    .catch((err) => {
+      if (err.code === 11000) {
+        return next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+      }
+      return next(err);
     });
 };
 
