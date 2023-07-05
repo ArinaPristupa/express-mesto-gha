@@ -1,9 +1,11 @@
 const { celebrate, Joi } = require('celebrate');
 
+const valUrl = /^(https?:\/\/)(www\.)?(?!-)[-a-zA-Z0-9@:%._~#=]{1,249}(?<!-)\.[A-Za-z]{2,6}([-a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=]*)#?$/;
+
 module.exports.validationCreateCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().required().pattern(/^https?:\/\/\S+$/i),
+    link: Joi.string().required().pattern(valUrl),
   }),
 });
 
@@ -28,7 +30,7 @@ module.exports.validationCreateUser = celebrate({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
       email: Joi.string().required().email(),
-      avatar: Joi.string().pattern(/^https?:\/\/\S+$/i),
+      avatar: Joi.string().pattern(valUrl),
       password: Joi.string().required(),
     }),
 });
@@ -61,6 +63,6 @@ module.exports.validationUpdateAvatar = celebrate({
     .keys({
       avatar: Joi.string()
         .required()
-        .pattern(/^https?:\/\/\S+$/i),
+        .pattern(valUrl),
     }),
 });
