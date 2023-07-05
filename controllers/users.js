@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
-const BadRequestError = require('../errors/BadRequestError');
+
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFoundError');
 
@@ -70,13 +70,9 @@ module.exports.createUser = (req, res, next) => {
           if (err.code === 11000) {
             return next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
           }
-          if (err.name === 'ValidationError') {
-            return next(new BadRequestError('Переданы некорректные данные'));
-          }
           return next(err);
         });
-    })
-    .catch(next);
+    });
 };
 
 module.exports.updateUser = (req, res, next) => {
