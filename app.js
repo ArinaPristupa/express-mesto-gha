@@ -28,12 +28,12 @@ app.post('/signin', validationLogin, login);
 
 app.use(auth);
 
+app.use('/users', require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
+
 app.use('/', router.all('*', (req, res, next) => {
   next(new NotFoundError('404 Ошибка! Данные не найдены!'));
 }));
-
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
 
 app.use(errors());
 
