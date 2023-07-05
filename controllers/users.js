@@ -32,10 +32,10 @@ module.exports.getUser = (req, res, next) => {
 
 module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(new NotFoundError('Пользователь не найден'))
-    .then((user) => {
-      res.send(user);
+    .orFail(() => {
+      throw new NotFoundError('Пользователь не найден');
     })
+    .then((user) => res.status(200).send(user))
     .catch(next);
 };
 
