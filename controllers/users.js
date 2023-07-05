@@ -31,11 +31,13 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.getUserId = (req, res, next) => {
-  User.findById(req.params._id)
-    .orFail(() => {
-      throw new NotFoundError('Пользователь не найден');
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден');
+      }
+      res.status(200).send(user);
     })
-    .then((user) => res.status(200).send(user))
     .catch(next);
 };
 
