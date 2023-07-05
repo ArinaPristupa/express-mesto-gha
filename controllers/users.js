@@ -71,8 +71,7 @@ module.exports.createUser = (req, res, next) => {
         return next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
       }
       return next(err);
-    })
-    .catch(next);
+    });
 };
 
 module.exports.updateUser = (req, res, next) => {
