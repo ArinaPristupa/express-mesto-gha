@@ -11,6 +11,8 @@ const auth = require('./middlewares/auth');
 const { validationCreateUser, validationLogin } = require('./middlewares/validation');
 const handleError = require('./middlewares/handleError');
 
+const NotFoundError = require('./errors/NotFoundError');
+
 const app = express();
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
@@ -22,9 +24,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(auth);
-app.use('/', router.all('*', (req, res) => res.status(404).send({
-  message: '404: Ошибка! Данные не найдены!',
-})));
+
+app.use('/', router.all('*', (req, res, next) => {
+  next(new NotFoundError('404 Ошибка! Данные не найдены!'));
+}));
 
 app.use(helmet());
 app.use(errors());

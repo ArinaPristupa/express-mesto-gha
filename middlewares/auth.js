@@ -1,48 +1,24 @@
 const jwt = require('jsonwebtoken');
 
-const { UnauthorizedError } = require('../utils/error/UnauthorizedError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 module.exports = (req, res, next) => {
-  const token = req.cookies.jwt;
+  const { authorization } = req.headers;
 
-  if (!token) {
-    throw new UnauthorizedError('Необходима авторизация');
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    throw new UnauthorizedError('Необходима авторизация!');
   }
 
+  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
-    payload = jwt.verify(token, 'secret-key');
+    payload = jwt.verify(token, 'JWT-token');
   } catch (err) {
-    throw new UnauthorizedError('Необходима авторизация');
+    return next(new UnauthorizedError('Необходима авторизация'));
   }
 
-  req.user = payload;
+  req.user = payload; // записываем пейлоуд в объект запроса
 
-  next();
+  return next(); // пропускаем запрос дальше
 };
-
-// const jwt = require('jsonwebtoken');
-
-// const { UnauthorizedError } = require('../utils/error/UnauthorizedError');
-
-// module.exports = (req, res, next) => {
-//   const { authorization } = req.headers;
-
-//   if (!authorization || !authorization.startsWith('Bearer ')) {
-//     throw new UnauthorizedError('Необходима авторизация!');
-//   }
-
-//   const token = authorization.replace('Bearer ', '');
-//   let payload;
-
-//   try {
-//     payload = jwt.verify(token, 'JWT-token');
-//   } catch (err) {
-//     return next(new UnauthorizedError('Необходима авторизация'));
-//   }
-
-//   req.user = payload; // записываем пейлоуд в объект запроса
-
-//   return next(); // пропускаем запрос дальше
-// };

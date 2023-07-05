@@ -1,10 +1,10 @@
 const Card = require('../models/card');
-const { NotFoundError } = require('../utils/error/NotFoundError');
-const { ForbiddenError } = require('../utils/error/ForbiddenError');
+const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
-    .then((card) => res.send(card))
+    .then((card) => res.status(200).send(card))
     .catch(next);
 };
 
@@ -23,11 +23,11 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(cardId)
     .orFail(new NotFoundError('Переданы неверные данные'))
     .then((card) => {
-      if (!card.owner.equals(req.user._id)) {
-        return Promise.reject(new ForbiddenError('Недостаточно прав'));
+      if (card.owner.toString() !== req.user._id) {
+        return next(new ForbiddenError('Недостаточно прав'));
       }
-      return Card.findByIdAndDelete(cardId)
-        .then(() => res.send({ data: 'Карточка успешно удалена' }));
+      return Card.deleteOne(card)
+        .then(() => res.status(200).send({ message: 'Карточка успешно удаленна!' }));
     })
     .catch(next);
 };
@@ -38,7 +38,7 @@ module.exports.likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .orFail(new NotFoundError('Переданы неверные данные'))
+    .orFail(new NotFoundError('Карточка не найдена'))
     .then((card) => res.send({ data: card }))
     .catch(next);
 };
@@ -49,7 +49,7 @@ module.exports.dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-    .orFail(new NotFoundError('Переданы неверные данные'))
+    .orFail(new NotFoundError('Карточка не найдена'))
     .then((card) => res.send({ data: card }))
     .catch(next);
 };

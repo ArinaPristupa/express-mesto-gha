@@ -1,25 +1,37 @@
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
-const { ConflictError } = require('../utils/error/ConflictError');
-const { NotFoundError } = require('../utils/error/NotFoundError');
+const ConflictError = require('../errors/ConflictError');
+const NotFoundError = require('../errors/NotFoundError');
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'JWT-token', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch(next);
+};
 
 module.exports.getUsers = (req, res, next) => {
-  User.find()
-    .then((user) => res.send(user))
+  User.find({})
+    .then((user) => res.status(200).send(user))
     .catch(next);
 };
 
 module.exports.getUser = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
-    .orFail(new NotFoundError('Переданы неверные данные'))
+    .orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => res.send(user))
     .catch(next);
 };
 
 module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
+    .orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => {
       res.send(user);
     })
@@ -59,7 +71,8 @@ module.exports.createUser = (req, res, next) => {
         return next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
       }
       return next(err);
-    });
+    })
+    .catch(next);
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -68,7 +81,9 @@ module.exports.updateUser = (req, res, next) => {
     name,
     about,
   }, { new: true, runValidators: true })
-    .orFail()
+    .orFail(() => {
+      throw new NotFoundError('Пользователь не найден');
+    })
     .then((user) => res.send({ data: user }))
     .catch(next);
 };
@@ -85,17 +100,9 @@ module.exports.updateAvatar = (req, res, next) => {
       new: true, runValidators: true,
     },
   )
-    .then((user) => res.send({ data: user }))
-    .catch(next);
-};
-
-module.exports.login = (req, res, next) => {
-  const { email, password } = req.body;
-
-  return User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'JWT-token', { expiresIn: '7d' });
-      res.send({ token });
+    .orFail(() => {
+      throw new NotFoundError('Аватар пользователя не найден');
     })
+    .then((user) => res.send({ data: user }))
     .catch(next);
 };
