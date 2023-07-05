@@ -1,6 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 
-const valUrl = /^(https?:\/\/)(www\.)?(?!-)[-a-zA-Z0-9@:%._~#=]{1,249}(?<!-)\.[A-Za-z]{2,6}([-a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=]*)#?$/;
+const valUrl = /^https?:\/\/(?:w{3}\.)?(?:[a-z0-9]+[a-z0-9-]*\.)+[a-z]{2,}(?::[0-9]+)?(?:\/\S*)?#?$/i;
 
 module.exports.validationCreateCard = celebrate({
   body: Joi.object().keys({
